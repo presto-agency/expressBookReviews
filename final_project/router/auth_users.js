@@ -23,7 +23,8 @@ regd_users.post("/login", (req,res) => {
   }
   
   if (authenticatedUser(username, password)) {
-    const accessToken = jwt.sign({ data: { password } }, JWT_SECRET_KEY, { expiresIn: 60 * 60 })
+    const user = { username, password }
+    const accessToken = jwt.sign({ user }, JWT_SECRET_KEY, { expiresIn: 60 * 60 })
     
     req.session.authorization = {
       accessToken, username
@@ -36,8 +37,22 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const { user: { username } } = req.user
+  const { isbn } = req.params
+  const { review } = req.body
+  
+  if (!review) {
+    return res.status(400).json({ message: 'Review is missing in body!' })
+  }
+  
+  const book = books[isbn]
+  if (!book){
+    return res.status(404).json({message: `Book with this ${isbn} ISBN not found!`});
+  }
+  
+  book.reviews = { ...book.reviews, [username]: { review } }
+  
+  return res.status(200).json(book);
 });
 
 module.exports.authenticated = regd_users;
