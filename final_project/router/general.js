@@ -71,7 +71,7 @@ public_users.get('/title/:title',function (req, res) {
     if (filteredBooks.length > 0) {
       return res.status(200).json(filteredBooks)
     } else {
-      return res.status(404).json({ error: `No books found with this title '${author}'` })
+      return res.status(404).json({ error: `No books found with this title '${title}'` })
     }
   } catch (error) {
     console.log(`Error with title request: ${error}`)
@@ -152,6 +152,7 @@ public_users.get('/v2/author/:author',function (req, res) {
     }
   })
   
+  
   getBooks.then((response) => {
     if (response.length > 0) {
       return res.status(200).json(response)
@@ -177,6 +178,7 @@ public_users.get('/v2/title/:title',function (req, res) {
       reject(error)
     }
   })
+  
   
   getBooks.then((response) => {
     if (response.length > 0) {
