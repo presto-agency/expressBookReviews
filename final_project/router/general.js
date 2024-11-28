@@ -112,4 +112,27 @@ public_users.get('/v2', async (req, res) => {
   }
 })
 
+// Get book details based on ISBN, using promise
+public_users.get('/v2/isbn/:isbn', async (req, res) => {
+  const { isbn } = req.params
+  
+  const getBooks = new Promise((resolve, reject) => {
+    try {
+      resolve(books)
+    } catch (error) {
+      console.log(`Error with books request: ${error}`)
+    }
+  })
+  
+  getBooks.then((response) => {
+    const book = response[isbn]
+    
+    if (book) {
+      return res.status(200).json(book);
+    } else {
+      return res.status(404).json({message: `Book with this ${isbn} ISBN not found!`});
+    }
+  })
+})
+
 module.exports.general = public_users;
