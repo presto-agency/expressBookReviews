@@ -3,6 +3,7 @@ const books = require("./booksdb.js");
 const {simplifyString} = require('../utils/simplifyString');
 const isValid = require("./auth_users.js").isValid;
 const { users } = require("./auth_users.js");
+const axios = require('axios');
 const public_users = express.Router();
 
 
@@ -95,5 +96,20 @@ public_users.get('/review/:isbn',function (req, res) {
     return res.status(500).json({ error: error.message })
   }
 });
+
+// With Axios, Tasks 10 - 13
+
+const apiURL = 'http://localhost:4000'
+
+// Get the book list available in the shop, using axios
+public_users.get('/v2', async (req, res) => {
+  try {
+  const { data } = await axios.get(`${apiURL}/`)
+    res.status(200).json(data)
+  } catch (error) {
+    console.log(`Error with books request: ${error}`)
+    return res.status(500).json({ error: error.message })
+  }
+})
 
 module.exports.general = public_users;
