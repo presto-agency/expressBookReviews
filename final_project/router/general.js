@@ -113,14 +113,14 @@ public_users.get('/v2', async (req, res) => {
 })
 
 // Get book details based on ISBN, using promise
-public_users.get('/v2/isbn/:isbn', async (req, res) => {
+public_users.get('/v2/isbn/:isbn',  (req, res) => {
   const { isbn } = req.params
   
   const getBooks = new Promise((resolve, reject) => {
     try {
       resolve(books)
     } catch (error) {
-      console.log(`Error with books request: ${error}`)
+      reject(error)
     }
   })
   
@@ -132,7 +132,37 @@ public_users.get('/v2/isbn/:isbn', async (req, res) => {
     } else {
       return res.status(404).json({message: `Book with this ${isbn} ISBN not found!`});
     }
+  }).catch((error) => {
+    console.error(`Error with ISBN request: ${error}`);
+    return res.status(500).json({ error: "Unable to fetch book data" });
   })
 })
+
+// Get book details based on author, using promise
+public_users.get('/v2/author/:author',function (req, res) {
+  const { author } = req.params
+  
+  const getBooks = new Promise((resolve, reject) => {
+    try {
+      const filteredBooks = Object.values(books).filter(book => simplifyString(book.author) === simplifyString(author))
+      
+      resolve(filteredBooks)
+    } catch (error) {
+      reject(error)
+    }
+  })
+  
+  
+  getBooks.then((response) => {
+    if (response.length > 0) {
+      return res.status(200).json(response)
+    } else {
+      return res.status(404).json({ error: `No books found with this author '${author}'` })
+    }
+  }).catch((error) => {
+    console.log(`Error with author request: ${error}`)
+    return res.status(500).json({ error: error.message })
+  })
+});
 
 module.exports.general = public_users;
